@@ -1,0 +1,172 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - link "MINO" [ref=e3] [cursor=pointer]:
+      - /url: models.html
+    - navigation [ref=e4]:
+      - link "Modelle" [ref=e5] [cursor=pointer]:
+        - /url: models.html
+      - link "Ausstattung" [ref=e6] [cursor=pointer]:
+        - /url: "#"
+      - link "Über MINO" [ref=e7] [cursor=pointer]:
+        - /url: "#"
+      - link "Kontakt" [ref=e8] [cursor=pointer]:
+        - /url: "#"
+  - generic [ref=e10]:
+    - generic [ref=e11]: Food Trailer Konfigurator
+    - heading "Wählen Sie Ihr Modell" [level=1] [ref=e12]
+    - paragraph [ref=e13]: Hochwertige Food Trailer direkt vom Hersteller – vollständig individualisierbar nach Ihren Anforderungen.
+    - generic [ref=e14]:
+      - button "Alle Modelle" [ref=e15] [cursor=pointer]
+      - button "Airstream" [ref=e16] [cursor=pointer]
+      - button "Square" [ref=e17] [cursor=pointer]
+      - button "Round" [ref=e18] [cursor=pointer]
+  - generic [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]: ⚙️
+      - generic [ref=e23]:
+        - strong [ref=e24]: 100 % individualisierbar
+        - text: Farbe, Fenster, Ausstattung
+    - generic [ref=e25]:
+      - generic [ref=e26]: 🚢
+      - generic [ref=e27]:
+        - strong [ref=e28]: Lieferung frei Haus
+        - text: 10–14 Wochen Lieferzeit
+    - generic [ref=e29]:
+      - generic [ref=e30]: 📋
+      - generic [ref=e31]:
+        - strong [ref=e32]: TÜV-Vorbereitung inklusive
+        - text: Alle EU-Normen erfüllt
+  - generic [ref=e33]:
+    - generic [ref=e35]:
+      - strong [ref=e36]: "5"
+      - text: Modelle verfügbar
+    - generic [ref=e37]:
+      - generic [ref=e38] [cursor=pointer]:
+        - img "SMR-2800" [ref=e40]
+        - generic [ref=e41]:
+          - generic [ref=e42]: Round Food Trailer
+          - generic [ref=e43]: SMR-2800
+          - generic [ref=e44]: Hochwertiger Fiberglas-Anhänger in charakteristischer Rundform. Kompakt, leicht und absoluter Hingucker auf jedem Markt.
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - generic [ref=e47]: 2,8 m
+              - generic [ref=e48]: Länge
+            - generic [ref=e49]:
+              - generic [ref=e50]: High-End Fiberglas
+              - generic [ref=e51]: Material
+            - generic [ref=e52]:
+              - generic [ref=e53]: 1-Achse
+              - generic [ref=e54]: Achsen
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]: ab
+              - generic [ref=e58]: 13.900 €
+              - generic [ref=e59]: exkl. MwSt.
+            - link "Konfigurieren" [ref=e61]:
+              - /url: index.html?model=smr-2800
+              - text: Konfigurieren
+              - img [ref=e62]
+      - generic [ref=e64] [cursor=pointer]:
+        - generic [ref=e66]: Bestseller
+        - img "SMA-4000" [ref=e68]
+        - generic [ref=e69]:
+          - generic [ref=e70]: Airstream Food Trailer
+          - generic [ref=e71]: SMA-4000
+          - generic [ref=e72]: Farbenfroher Airstream-Klassiker in zeitlosem Design. Vollständig in Ihrer Wunschfarbe erhältlich – der perfekte Eyecatcher.
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - generic [ref=e75]: 4,0 m
+              - generic [ref=e76]: Länge
+            - generic [ref=e77]:
+              - generic [ref=e78]: Galvanisierter Stahl
+              - generic [ref=e79]: Material
+            - generic [ref=e80]:
+              - generic [ref=e81]: Tandem
+              - generic [ref=e82]: Achsen
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - generic [ref=e85]: ab
+              - generic [ref=e86]: 18.900 €
+              - generic [ref=e87]: exkl. MwSt.
+            - link "Konfigurieren" [ref=e89]:
+              - /url: index.html?model=sma-4000
+              - text: Konfigurieren
+              - img [ref=e90]
+      - generic [ref=e92] [cursor=pointer]:
+        - generic [ref=e94]: Neu
+        - img "SMA-4500" [ref=e96]
+        - generic [ref=e97]:
+          - generic [ref=e98]: Airstream Food Trailer
+          - generic [ref=e99]: SMA-4500
+          - generic [ref=e100]: Hochwertiger Edelstahl-Airstream mit Spiegelfinish. Erhältlich in Gold, Silber und Roségold – Premium-Auftritt für Ihr Business.
+          - generic [ref=e101]:
+            - generic [ref=e102]:
+              - generic [ref=e103]: 4,5 m
+              - generic [ref=e104]: Länge
+            - generic [ref=e105]:
+              - generic [ref=e106]: Edelstahl (poliert)
+              - generic [ref=e107]: Material
+            - generic [ref=e108]:
+              - generic [ref=e109]: Tandem
+              - generic [ref=e110]: Achsen
+          - generic [ref=e111]:
+            - generic [ref=e112]:
+              - generic [ref=e113]: ab
+              - generic [ref=e114]: 22.900 €
+              - generic [ref=e115]: exkl. MwSt.
+            - link "Konfigurieren" [ref=e117]:
+              - /url: index.html?model=sma-4500
+              - text: Konfigurieren
+              - img [ref=e118]
+      - generic [ref=e120] [cursor=pointer]:
+        - generic [ref=e122]: Neu
+        - img "SMS-5000" [ref=e124]
+        - generic [ref=e125]:
+          - generic [ref=e126]: Square Food Trailer
+          - generic [ref=e127]: SMS-5000
+          - generic [ref=e128]: Professioneller Quadrat-Trailer mit integriertem LED-Werbeschild. Maximale Sichtbarkeit und Arbeitsfläche für anspruchsvolle Betreiber.
+          - generic [ref=e129]:
+            - generic [ref=e130]:
+              - generic [ref=e131]: 5,0 m
+              - generic [ref=e132]: Länge
+            - generic [ref=e133]:
+              - generic [ref=e134]: Composite Board
+              - generic [ref=e135]: Material
+            - generic [ref=e136]:
+              - generic [ref=e137]: Tandem
+              - generic [ref=e138]: Achsen
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - generic [ref=e141]: ab
+              - generic [ref=e142]: 21.900 €
+              - generic [ref=e143]: exkl. MwSt.
+            - link "Konfigurieren" [ref=e145]:
+              - /url: index.html?model=sms-5000
+              - text: Konfigurieren
+              - img [ref=e146]
+      - generic [ref=e148] [cursor=pointer]:
+        - generic [ref=e150]: XL
+        - img "SMA-5500" [ref=e152]
+        - generic [ref=e153]:
+          - generic [ref=e154]: Airstream Food Trailer
+          - generic [ref=e155]: SMA-5500
+          - generic [ref=e156]: "Der größte Airstream im Portfolio: mattem Edelstahl-Finish in Schneeflockenoptik. Für Betreiber, die keine Kompromisse eingehen."
+          - generic [ref=e157]:
+            - generic [ref=e158]:
+              - generic [ref=e159]: 5,5 m
+              - generic [ref=e160]: Länge
+            - generic [ref=e161]:
+              - generic [ref=e162]: Edelstahl (Snowflake Frost)
+              - generic [ref=e163]: Material
+            - generic [ref=e164]:
+              - generic [ref=e165]: Tandem
+              - generic [ref=e166]: Achsen
+          - generic [ref=e167]:
+            - generic [ref=e168]:
+              - generic [ref=e169]: ab
+              - generic [ref=e170]: 26.900 €
+              - generic [ref=e171]: exkl. MwSt.
+            - link "Konfigurieren" [ref=e173]:
+              - /url: index.html?model=sma-5500
+              - text: Konfigurieren
+              - img [ref=e174]

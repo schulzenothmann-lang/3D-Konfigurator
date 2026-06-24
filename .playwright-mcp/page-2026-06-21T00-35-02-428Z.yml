@@ -1,0 +1,79 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - link "MINO" [ref=e3] [cursor=pointer]:
+      - /url: models.html
+    - link "Alle Modelle" [ref=e4] [cursor=pointer]:
+      - /url: models.html
+      - img [ref=e5]
+      - text: Alle Modelle
+    - navigation [ref=e7]:
+      - button "1 Modell" [ref=e8] [cursor=pointer]:
+        - generic [ref=e9]:
+          - generic [ref=e10]: "1"
+          - generic [ref=e11]: Modell
+      - button "2 Farbe" [ref=e12] [cursor=pointer]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: "2"
+          - generic [ref=e15]: Farbe
+      - button "3 Fenster" [ref=e16] [cursor=pointer]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: "3"
+          - generic [ref=e19]: Fenster
+      - button "4 Extras" [ref=e20] [cursor=pointer]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: "4"
+          - generic [ref=e23]: Extras
+      - button "5 Übersicht" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]:
+          - generic [ref=e26]: "5"
+          - generic [ref=e27]: Übersicht
+    - generic [ref=e29]:
+      - text: Konfiguriert ab
+      - strong [ref=e30]: 32.900 €
+  - generic [ref=e31]:
+    - generic [ref=e32]:
+      - generic:
+        - img
+        - generic: 3D-Modell folgt
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e36]: Schritt 1 – Modell
+        - generic [ref=e37]: Modell & Größe
+        - generic [ref=e38]: Wählen Sie das Basismodell Ihres Food Trailers.
+      - generic [ref=e41]:
+        - generic [ref=e42] [cursor=pointer]:
+          - img [ref=e44]
+          - generic [ref=e51]:
+            - generic [ref=e52]: S – Compact
+            - generic [ref=e53]: 3,5 m × 2,1 m × 2,5 m
+            - generic [ref=e54]: Einzelachse · bis 2.500 kg
+          - generic [ref=e55]: ab 18.900 €
+        - generic [ref=e57] [cursor=pointer]:
+          - img [ref=e59]
+          - generic [ref=e66]:
+            - generic [ref=e67]: M – Standard
+            - generic [ref=e68]: 5,0 m × 2,1 m × 2,7 m
+            - generic [ref=e69]: Tandem-Achse · bis 3.500 kg
+          - generic [ref=e70]: ab 24.900 €
+        - generic [ref=e72] [cursor=pointer]:
+          - img [ref=e74]
+          - generic [ref=e81]:
+            - generic [ref=e82]: L – Pro
+            - generic [ref=e83]: 6,5 m × 2,4 m × 2,9 m
+            - generic [ref=e84]: Tandem-Achse · bis 3.500 kg
+          - generic [ref=e85]: ab 32.900 €
+        - generic [ref=e87] [cursor=pointer]:
+          - img [ref=e89]
+          - generic [ref=e96]:
+            - generic [ref=e97]: XL – Event
+            - generic [ref=e98]: 8,0 m × 2,4 m × 2,9 m
+            - generic [ref=e99]: Tri-Achse · bis 5.000 kg
+          - generic [ref=e100]: ab 42.900 €
+  - generic [ref=e102]:
+    - generic [ref=e103]:
+      - generic [ref=e104]: Schritt 1 von 5
+      - generic [ref=e105]: Gesamtpreis 32.900 €
+    - button "← Zurück" [disabled] [ref=e106]
+    - button "Weiter" [ref=e107] [cursor=pointer]:
+      - text: Weiter
+      - img [ref=e108]

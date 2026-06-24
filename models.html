@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINO – Food Trailer Modelle</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --white: #ffffff;
+  --off:   #f5f5f3;
+  --light: #ebebeb;
+  --mid:   #c0c0c0;
+  --dark:  #1c1c1e;
+  --black: #0a0a0a;
+  --accent:#1a4a6b;
+  --accent2:#2563a8;
+  --muted: #6b6b6e;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+html { font-size: 16px; scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--white); color: var(--dark); }
+
+/* ============================================================
+   HEADER
+============================================================ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,10,.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+}
+.logo {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -.04em;
+  color: var(--white);
+  text-decoration: none;
+}
+.logo span { color: #5b9bd5; }
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.header-nav a {
+  font-size: .8rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.55);
+  text-decoration: none;
+  letter-spacing: .03em;
+  transition: color .2s;
+}
+.header-nav a:hover { color: var(--white); }
+.header-nav a.active { color: var(--white); }
+.btn-contact {
+  padding: .45rem 1.1rem;
+  border-radius: 7px;
+  border: 1.5px solid rgba(255,255,255,.25);
+  background: transparent;
+  color: rgba(255,255,255,.8);
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  text-decoration: none;
+}
+.btn-contact:hover {
+  background: rgba(255,255,255,.1);
+  border-color: rgba(255,255,255,.5);
+  color: var(--white);
+}
+
+/* ============================================================
+   HERO
+============================================================ */
+.hero {
+  background: var(--black);
+  padding: 5rem 2.5rem 4rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+  background-size: 80px 80px;
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center top, rgba(37,99,168,.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+.hero-label {
+  display: inline-block;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  background: rgba(37,99,168,.15);
+  border: 1px solid rgba(37,99,168,.3);
+  padding: .28rem .8rem;
+  border-radius: 100px;
+  margin-bottom: 1.25rem;
+}
+.hero h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -.04em;
+  color: var(--white);
+  line-height: 1.1;
+  margin-bottom: .9rem;
+}
+.hero p {
+  font-size: 1rem;
+  color: rgba(255,255,255,.5);
+  line-height: 1.7;
+  max-width: 520px;
+  margin: 0 auto 2rem;
+}
+.hero-filters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  padding: .4rem 1rem;
+  border-radius: 100px;
+  border: 1.5px solid rgba(255,255,255,.15);
+  background: transparent;
+  color: rgba(255,255,255,.5);
+  font-size: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  letter-spacing: .03em;
+}
+.filter-btn:hover { border-color: rgba(255,255,255,.4); color: rgba(255,255,255,.85); }
+.filter-btn.active {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.4);
+  color: var(--white);
+}
+
+/* ============================================================
+   MODEL GRID
+============================================================ */
+.models-section {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 3rem 2rem 5rem;
+}
+.models-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+.models-count {
+  font-size: .78rem;
+  color: var(--muted);
+}
+.models-count strong { color: var(--dark); }
+
+.models-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ============================================================
+   MODEL CARD
+============================================================ */
+.model-card {
+  background: var(--white);
+  border: 1.5px solid var(--light);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all .25s var(--ease);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.model-card:hover {
+  border-color: #b8d0e8;
+  box-shadow: 0 12px 40px rgba(0,0,0,.1);
+  transform: translateY(-3px);
+}
+
+/* Badges */
+.card-badges {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  gap: .4rem;
+  z-index: 2;
+}
+.badge {
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: .22rem .6rem;
+  border-radius: 100px;
+}
+.badge-new { background: var(--accent2); color: var(--white); }
+.badge-popular { background: #16a34a; color: var(--white); }
+.badge-xl { background: #7c3aed; color: var(--white); }
+.badge-sale { background: #dc2626; color: var(--white); }
+
+/* Trailer visual */
+.card-visual {
+  background: #f5f5f5;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.card-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center 60%;
+  padding: 1rem 1.5rem;
+  transition: transform .35s var(--ease);
+}
+.model-card:hover .card-visual img { transform: scale(1.04); }
+.card-visual svg {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  filter: drop-shadow(0 10px 30px rgba(0,0,0,.6));
+  position: relative;
+  z-index: 1;
+  transition: transform .3s var(--ease);
+}
+.model-card:hover .card-visual svg { transform: scale(1.03); }
+
+/* Ground shadow in SVG */
+.card-ground {
+  fill: rgba(255,255,255,.06);
+}
+
+/* Card body */
+.card-body {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.card-series {
+  font-size: .67rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: .35rem;
+}
+.card-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: var(--dark);
+  line-height: 1.2;
+  margin-bottom: .25rem;
+}
+.card-tagline {
+  font-size: .8rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 1.1rem;
+}
+
+/* Specs row */
+.card-specs {
+  display: flex;
+  gap: 0;
+  background: var(--off);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+.spec-item {
+  flex: 1;
+  padding: .6rem .5rem;
+  text-align: center;
+  border-right: 1px solid var(--light);
+}
+.spec-item:last-child { border-right: none; }
+.spec-value {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--dark);
+  letter-spacing: -.01em;
+}
+.spec-label {
+  font-size: .62rem;
+  color: var(--muted);
+  margin-top: .1rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* Price + CTA */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.card-price {
+  display: flex;
+  flex-direction: column;
+}
+.price-from {
+  font-size: .65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.price-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--dark);
+  letter-spacing: -.03em;
+}
+.price-note {
+  font-size: .62rem;
+  color: var(--muted);
+  margin-top: .1rem;
+}
+.card-actions {
+  display: flex;
+  gap: .5rem;
+}
+.btn-details {
+  padding: .55rem 1rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--light);
+  background: var(--white);
+  color: var(--dark);
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.btn-details:hover { border-color: var(--mid); background: var(--off); }
+.btn-configure {
+  padding: .55rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: var(--white);
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  white-space: nowrap;
+}
+.btn-configure:hover {
+  background: var(--accent2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(26,74,107,.3);
+}
+
+/* ============================================================
+   COMPARE BAR (sticky bottom)
+============================================================ */
+.compare-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(10,10,10,.97);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding: 1rem 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  z-index: 200;
+  transform: translateY(100%);
+  transition: transform .3s var(--ease);
+}
+.compare-bar.visible { transform: translateY(0); }
+.compare-slots {
+  display: flex;
+  gap: .75rem;
+  flex: 1;
+}
+.compare-slot {
+  width: 180px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1.5px dashed rgba(255,255,255,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .72rem;
+  color: rgba(255,255,255,.3);
+  gap: .4rem;
+  position: relative;
+  overflow: hidden;
+}
+.compare-slot.filled {
+  border-style: solid;
+  border-color: rgba(255,255,255,.25);
+  background: rgba(255,255,255,.06);
+  justify-content: space-between;
+  padding: 0 .6rem;
+}
+.compare-slot-name {
+  font-size: .72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.8);
+}
+.compare-slot-remove {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.4);
+  cursor: pointer;
+  font-size: .9rem;
+  padding: 0;
+  line-height: 1;
+}
+.compare-slot-remove:hover { color: rgba(255,255,255,.8); }
+.btn-compare {
+  padding: .65rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent2);
+  color: var(--white);
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.btn-compare:hover { background: #1d4ed8; }
+.compare-clear {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.4);
+  font-size: .75rem;
+  cursor: pointer;
+}
+.compare-clear:hover { color: rgba(255,255,255,.7); }
+
+/* ============================================================
+   USP STRIP
+============================================================ */
+.usp-strip {
+  background: var(--off);
+  border-top: 1px solid var(--light);
+  border-bottom: 1px solid var(--light);
+  padding: 1.5rem 2.5rem;
+}
+.usp-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.usp-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.usp-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.usp-text strong {
+  display: block;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+.usp-text span {
+  font-size: .72rem;
+  color: var(--muted);
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 700px) {
+  .models-grid { grid-template-columns: 1fr; }
+  .hero { padding: 3rem 1.25rem 2.5rem; }
+  .hero h1 { font-size: 1.8rem; }
+  .models-section { padding: 2rem 1rem 4rem; }
+  .site-header { padding: 0 1.25rem; }
+  .header-nav { gap: .75rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a class="logo" href="models.html">MI<span>NO</span></a>
+  <nav class="header-nav">
+    <a href="models.html" class="active">Modelle</a>
+    <a href="#">Ausstattung</a>
+    <a href="#">Über MINO</a>
+    <a href="#" class="btn-contact">Kontakt</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Food Trailer Konfigurator</div>
+    <h1>Wählen Sie Ihr Modell</h1>
+    <p>Hochwertige Food Trailer direkt vom Hersteller – vollständig individualisierbar nach Ihren Anforderungen.</p>
+    <div class="hero-filters">
+      <button class="filter-btn active" onclick="filterModels('all', this)">Alle Modelle</button>
+      <button class="filter-btn" onclick="filterModels('airstream', this)">Airstream</button>
+      <button class="filter-btn" onclick="filterModels('square', this)">Square</button>
+      <button class="filter-btn" onclick="filterModels('round', this)">Round</button>
+    </div>
+  </div>
+</section>
+
+<!-- USP STRIP -->
+<div class="usp-strip">
+  <div class="usp-inner">
+    <div class="usp-item">
+      <div class="usp-icon">⚙️</div>
+      <div class="usp-text">
+        <strong>100 % individualisierbar</strong>
+        <span>Farbe, Fenster, Ausstattung</span>
+      </div>
+    </div>
+    <div class="usp-item">
+      <div class="usp-icon">🚢</div>
+      <div class="usp-text">
+        <strong>Lieferung frei Haus</strong>
+        <span>10–14 Wochen Lieferzeit</span>
+      </div>
+    </div>
+    <div class="usp-item">
+      <div class="usp-icon">📋</div>
+      <div class="usp-text">
+        <strong>TÜV-Vorbereitung inklusive</strong>
+        <span>Alle EU-Normen erfüllt</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODELS GRID -->
+<section class="models-section">
+  <div class="models-header">
+    <div class="models-count"><strong id="modelCount">5</strong> Modelle verfügbar</div>
+  </div>
+  <div class="models-grid" id="modelsGrid">
+    <!-- Rendered by JS -->
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   MODEL DATA
+============================================================ */
+const MODELS = [
+  {
+    id: 'smr-2800',
+    series: 'Round Food Trailer',
+    name: 'SMR-2800',
+    tagline: 'Hochwertiger Fiberglas-Anhänger in charakteristischer Rundform. Kompakt, leicht und absoluter Hingucker auf jedem Markt.',
+    category: 'round',
+    badge: null,
+    length: '2,8 m',
+    size: '2,8 × 2,16 × 2,5 m',
+    material: 'High-End Fiberglas',
+    axle: '1-Achse',
+    basePrice: 13900,
+    accentColor: '#f0a500',
+    shape: 'round'
+  },
+  {
+    id: 'sma-4000',
+    series: 'Airstream Food Trailer',
+    name: 'SMA-4000',
+    tagline: 'Farbenfroher Airstream-Klassiker in zeitlosem Design. Vollständig in Ihrer Wunschfarbe erhältlich – der perfekte Eyecatcher.',
+    category: 'airstream',
+    badge: 'popular',
+    badgeLabel: 'Bestseller',
+    length: '4,0 m',
+    size: '4,0 × 2,16 × 2,5 m',
+    material: 'Galvanisierter Stahl',
+    axle: 'Tandem',
+    basePrice: 18900,
+    accentColor: '#e86020',
+    shape: 'airstream'
+  },
+  {
+    id: 'sma-4500',
+    series: 'Airstream Food Trailer',
+    name: 'SMA-4500',
+    tagline: 'Hochwertiger Edelstahl-Airstream mit Spiegelfinish. Erhältlich in Gold, Silber und Roségold – Premium-Auftritt für Ihr Business.',
+    category: 'airstream',
+    badge: 'new',
+    badgeLabel: 'Neu',
+    length: '4,5 m',
+    size: '4,5 × 2,16 × 2,5 m',
+    material: 'Edelstahl (poliert)',
+    axle: 'Tandem',
+    basePrice: 22900,
+    accentColor: '#c0c0c0',
+    shape: 'airstream',
+    steel: true
+  },
+  {
+    id: 'sms-5000',
+    series: 'Square Food Trailer',
+    name: 'SMS-5000',
+    tagline: 'Professioneller Quadrat-Trailer mit integriertem LED-Werbeschild. Maximale Sichtbarkeit und Arbeitsfläche für anspruchsvolle Betreiber.',
+    category: 'square',
+    badge: 'new',
+    badgeLabel: 'Neu',
+    length: '5,0 m',
+    size: '5,0 × 2,1 × 2,4 m',
+    material: 'Composite Board',
+    axle: 'Tandem',
+    basePrice: 21900,
+    accentColor: '#111111',
+    shape: 'square',
+    ledSign: true
+  },
+  {
+    id: 'sma-5500',
+    series: 'Airstream Food Trailer',
+    name: 'SMA-5500',
+    tagline: 'Der größte Airstream im Portfolio: mattem Edelstahl-Finish in Schneeflockenoptik. Für Betreiber, die keine Kompromisse eingehen.',
+    category: 'airstream',
+    badge: 'xl',
+    badgeLabel: 'XL',
+    length: '5,5 m',
+    size: '5,5 × 2,16 × 2,5 m',
+    material: 'Edelstahl (Snowflake Frost)',
+    axle: 'Tandem',
+    basePrice: 26900,
+    accentColor: '#d8d8d8',
+    shape: 'airstream',
+    steel: true,
+    large: true
+  }
+];
+
+/* ============================================================
+   SVG BUILDERS — one per trailer shape
+============================================================ */
+
+function wheel(cx, cy, r) {
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#2a2a2a"/>
+    <circle cx="${cx}" cy="${cy}" r="${Math.round(r*.72)}" fill="#181818"/>
+    <circle cx="${cx}" cy="${cy}" r="${Math.round(r*.34)}" fill="#444"/>
+    <circle cx="${cx}" cy="${cy}" r="${Math.round(r*.18)}" fill="#888"/>
+    <line x1="${cx}" y1="${cy-r*.55}" x2="${cx}" y2="${cy-r*.78}" stroke="#555" stroke-width="2"/>
+    <line x1="${cx}" y1="${cy+r*.55}" x2="${cx}" y2="${cy+r*.78}" stroke="#555" stroke-width="2"/>
+    <line x1="${cx-r*.55}" y1="${cy}" x2="${cx-r*.78}" y2="${cy}" stroke="#555" stroke-width="2"/>
+    <line x1="${cx+r*.55}" y1="${cy}" x2="${cx+r*.78}" y2="${cy}" stroke="#555" stroke-width="2"/>`;
+}
+
+/* --- AIRSTREAM --- */
+function svgAirstream(m) {
+  const bw = m.large ? 248 : m.steel ? 218 : 190;
+  const bh = 88;
+  const bx = Math.round((310 - bw) / 2 - 10);
+  const by = 28;
+  const rx = bh / 2;  // very rounded — true airstream shape
+
+  const bodyColor = m.steel ? m.accentColor : m.accentColor;
+  const stripe1   = m.steel ? 'rgba(255,255,255,.55)' : 'rgba(255,255,255,.25)';
+  const stripe2   = m.steel ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.12)';
+  const winFill   = 'rgba(120,190,215,.7)';
+  const winStroke = 'rgba(255,255,255,.35)';
+
+  // window proportions
+  const wh = 34, wy = by + (bh - wh) / 2;
+  const ww = Math.round(bw * 0.52), wx = bx + Math.round(bw * 0.12);
+
+  // wheels
+  const wr = 19;
+  const w1x = bx + Math.round(bw * 0.28);
+  const w2x = bx + Math.round(bw * 0.68);
+  const wy2 = by + bh + 18;
+
+  return `<svg viewBox="0 0 310 175" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ag${m.id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,.22)"/>
+      <stop offset="60%" stop-color="rgba(255,255,255,.0)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,.25)"/>
+    </linearGradient>
+    <linearGradient id="sg${m.id}" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(255,255,255,.0)"/>
+      <stop offset="30%" stop-color="${stripe1}"/>
+      <stop offset="70%" stop-color="${stripe1}"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,.0)"/>
+    </linearGradient>
+  </defs>
+  <!-- Ground shadow -->
+  <ellipse cx="155" cy="170" rx="${Math.round(bw*.52)}" ry="5" fill="rgba(255,255,255,.06)"/>
+  <!-- Hitch -->
+  <rect x="${bx+bw-2}" y="${by+bh/2-2}" width="32" height="5" rx="2" fill="#777"/>
+  <circle cx="${bx+bw+30}" cy="${by+bh/2}" r="5" fill="#555"/>
+  <!-- Body (airstream rounded) -->
+  <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="${rx}" fill="${bodyColor}"/>
+  <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="${rx}" fill="url(#ag${m.id})"/>
+  <!-- Horizontal stripes (rivet lines) -->
+  <rect x="${bx+rx*.3}" y="${by + bh*.28}" width="${bw - rx*.6}" height="2" rx="1" fill="url(#sg${m.id})"/>
+  <rect x="${bx+rx*.3}" y="${by + bh*.55}" width="${bw - rx*.6}" height="2" rx="1" fill="url(#sg${m.id})"/>
+  <rect x="${bx+rx*.3}" y="${by + bh*.78}" width="${bw - rx*.6}" height="2" rx="1" fill="url(#sg${m.id})"/>
+  <!-- Stripe band (lower third) -->
+  <clipPath id="clip${m.id}"><rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="${rx}"/></clipPath>
+  <rect x="${bx}" y="${by+bh*.62}" width="${bw}" height="${bh*.38}" fill="${stripe2}" clip-path="url(#clip${m.id})"/>
+  <!-- Service window -->
+  <rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" rx="3" fill="rgba(0,0,0,.3)" stroke="${winStroke}" stroke-width="1.5"/>
+  <rect x="${wx+3}" y="${wy+3}" width="${ww-6}" height="${wh-6}" rx="2" fill="${winFill}"/>
+  <rect x="${wx+6}" y="${wy+5}" width="${Math.round(ww*.25)}" height="${Math.round(wh*.4)}" rx="1" fill="rgba(255,255,255,.18)"/>
+  <!-- Jacks -->
+  <rect x="${bx+20}" y="${by+bh}" width="4" height="14" rx="1" fill="#888"/>
+  <rect x="${bx+17}" y="${by+bh+12}" width="10" height="3" rx="1" fill="#777"/>
+  <rect x="${bx+bw-24}" y="${by+bh}" width="4" height="14" rx="1" fill="#888"/>
+  <rect x="${bx+bw-27}" y="${by+bh+12}" width="10" height="3" rx="1" fill="#777"/>
+  <!-- Axle -->
+  <rect x="${w1x-wr}" y="${wy2-10}" width="${w2x-w1x+wr*2}" height="5" rx="2" fill="#555"/>
+  <!-- Wheels -->
+  ${wheel(w1x, wy2, wr)}
+  ${wheel(w2x, wy2, wr)}
+  <!-- Wheel covers (white wall) -->
+  <circle cx="${w1x}" cy="${wy2}" r="${Math.round(wr*.72)}" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/>
+  <circle cx="${w2x}" cy="${wy2}" r="${Math.round(wr*.72)}" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/>
+</svg>`;
+}
+
+/* --- SQUARE --- */
+function svgSquare(m) {
+  const bw = 230, bh = 96;
+  const bx = Math.round((310 - bw) / 2 - 8);
+  const by = 22;
+  const winFill = 'rgba(140,200,225,.65)';
+  const wr = 19;
+  const w1x = bx + Math.round(bw * 0.22);
+  const w2x = bx + Math.round(bw * 0.7);
+  const wy2 = by + bh + 18;
+  const stripY = by + bh - 12;
+
+  // LED sign area
+  const ledH = m.ledSign ? 18 : 0;
+  const ledY = by + 6;
+  const winH = 38, winY = by + ledH + 10;
+  const winW = Math.round(bw * 0.62), winX = bx + 14;
+
+  return `<svg viewBox="0 0 310 175" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sg${m.id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,.1)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,.22)"/>
+    </linearGradient>
+    <filter id="glow${m.id}"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <!-- Ground -->
+  <ellipse cx="155" cy="170" rx="${Math.round(bw*.5)}" ry="5" fill="rgba(255,255,255,.06)"/>
+  <!-- Hitch -->
+  <rect x="${bx+bw}" y="${by+bh/2-2}" width="30" height="5" rx="2" fill="#777"/>
+  <circle cx="${bx+bw+28}" cy="${by+bh/2}" r="5" fill="#555"/>
+  <!-- Body -->
+  <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="5" fill="${m.accentColor}"/>
+  <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="5" fill="url(#sg${m.id})"/>
+  <!-- Diamond bottom strip -->
+  <rect x="${bx}" y="${stripY}" width="${bw}" height="12" rx="3" fill="#a8a8a8"/>
+  <!-- Corner trims -->
+  <rect x="${bx}" y="${by}" width="5" height="${bh}" rx="2" fill="#b0b0b0" opacity=".7"/>
+  <rect x="${bx+bw-5}" y="${by}" width="5" height="${bh}" rx="2" fill="#b0b0b0" opacity=".7"/>
+  <!-- Roof -->
+  <rect x="${bx-4}" y="${by-10}" width="${bw+8}" height="16" rx="4" fill="#ccc"/>
+  <rect x="${bx-4}" y="${by-10}" width="${bw+8}" height="6" rx="3" fill="#ddd"/>
+  <!-- LED sign -->
+  ${m.ledSign ? `
+  <rect x="${bx+10}" y="${ledY}" width="${Math.round(bw*.68)}" height="${ledH}" rx="3" fill="#050a05"/>
+  <rect x="${bx+13}" y="${ledY+3}" width="${Math.round(bw*.62)}" height="${ledH-6}" rx="1" fill="#001500"/>
+  <text x="${bx+10+Math.round(bw*.34)}" y="${ledY+13}" text-anchor="middle" fill="#00ff41" font-family="monospace" font-size="9" font-weight="700" filter="url(#glow${m.id})">FOOD TRAILER</text>
+  ` : ''}
+  <!-- Service window -->
+  <rect x="${winX}" y="${winY}" width="${winW}" height="${winH}" rx="3" fill="rgba(0,0,0,.25)" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+  <rect x="${winX+3}" y="${winY+3}" width="${winW-6}" height="${winH-6}" rx="2" fill="${winFill}"/>
+  <rect x="${winX+6}" y="${winY+5}" width="${Math.round(winW*.2)}" height="${Math.round(winH*.4)}" rx="1" fill="rgba(255,255,255,.2)"/>
+  <!-- Counter ledge -->
+  <rect x="${winX-2}" y="${winY+winH}" width="${winW+4}" height="4" rx="2" fill="#a0a0a0"/>
+  <!-- Lights -->
+  <rect x="${bx+3}" y="${by+5}" width="6" height="3" rx="1" fill="#ffcc00" opacity=".9"/>
+  <rect x="${bx+3}" y="${stripY-5}" width="6" height="3" rx="1" fill="#ff3300" opacity=".9"/>
+  <!-- Jacks -->
+  <rect x="${bx+14}" y="${by+bh}" width="4" height="14" rx="1" fill="#888"/>
+  <rect x="${bx+11}" y="${by+bh+12}" width="10" height="3" rx="1" fill="#777"/>
+  <rect x="${bx+bw-18}" y="${by+bh}" width="4" height="14" rx="1" fill="#888"/>
+  <rect x="${bx+bw-21}" y="${by+bh+12}" width="10" height="3" rx="1" fill="#777"/>
+  <!-- Axle -->
+  <rect x="${w1x-wr}" y="${wy2-10}" width="${w2x-w1x+wr*2}" height="5" rx="2" fill="#555"/>
+  <!-- Wheels -->
+  ${wheel(w1x, wy2, wr)}
+  ${wheel(w2x, wy2, wr)}
+</svg>`;
+}
+
+/* --- ROUND (teardrop) --- */
+function svgRound(m) {
+  // Compact teardrop: wider than tall, very rounded
+  const bw = 160, bh = 90;
+  const bx = Math.round((310 - bw) / 2 - 15);
+  const by = 28;
+  const bodyColor = m.accentColor;
+
+  const winFill = 'rgba(140,200,225,.7)';
+  const wr = 18;
+  const w1x = bx + Math.round(bw * 0.3);
+  const w2x = bx + Math.round(bw * 0.72);
+  const wy2 = by + bh + 18;
+
+  // Window
+  const ww = Math.round(bw * 0.55), wh = 32;
+  const wx = bx + Math.round(bw * 0.2), winY = by + (bh - wh) / 2;
+
+  return `<svg viewBox="0 0 310 175" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="rg${m.id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,.25)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,.25)"/>
+    </linearGradient>
+    <radialGradient id="rh${m.id}" cx="35%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="rgba(255,255,255,.3)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,.0)"/>
+    </radialGradient>
+    <clipPath id="rc${m.id}"><ellipse cx="${bx+bw/2}" cy="${by+bh/2}" rx="${bw/2}" ry="${bh/2}"/></clipPath>
+  </defs>
+  <!-- Ground -->
+  <ellipse cx="155" cy="170" rx="${Math.round(bw*.55)}" ry="5" fill="rgba(255,255,255,.06)"/>
+  <!-- Hitch -->
+  <rect x="${bx+bw-2}" y="${by+bh/2-2}" width="28" height="5" rx="2" fill="#777"/>
+  <circle cx="${bx+bw+26}" cy="${by+bh/2}" r="5" fill="#555"/>
+  <!-- Body (egg/teardrop shape using ellipse) -->
+  <ellipse cx="${bx+bw/2}" cy="${by+bh/2}" rx="${bw/2}" ry="${bh/2}" fill="${bodyColor}"/>
+  <ellipse cx="${bx+bw/2}" cy="${by+bh/2}" rx="${bw/2}" ry="${bh/2}" fill="url(#rg${m.id})"/>
+  <ellipse cx="${bx+bw/2}" cy="${by+bh/2}" rx="${bw/2}" ry="${bh/2}" fill="url(#rh${m.id})"/>
+  <!-- Bottom accent stripe -->
+  <rect x="${bx+12}" y="${by+bh*.65}" width="${bw-24}" height="${bh*.3}" fill="rgba(0,0,0,.18)" clip-path="url(#rc${m.id})"/>
+  <!-- Service window -->
+  <rect x="${wx}" y="${winY}" width="${ww}" height="${wh}" rx="4" fill="rgba(0,0,0,.3)" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+  <rect x="${wx+3}" y="${winY+3}" width="${ww-6}" height="${wh-6}" rx="3" fill="${winFill}"/>
+  <rect x="${wx+6}" y="${winY+5}" width="${Math.round(ww*.22)}" height="${Math.round(wh*.4)}" rx="1" fill="rgba(255,255,255,.22)"/>
+  <!-- Counter ledge (straight bottom edge) -->
+  <rect x="${wx-2}" y="${winY+wh}" width="${ww+4}" height="4" rx="2" fill="rgba(255,255,255,.3)"/>
+  <!-- Jack (single, centered) -->
+  <rect x="${bx+bw/2-2}" y="${by+bh-4}" width="4" height="16" rx="1" fill="#888"/>
+  <rect x="${bx+bw/2-6}" y="${by+bh+10}" width="12" height="3" rx="1" fill="#777"/>
+  <!-- Axle (single) -->
+  <rect x="${w1x-wr}" y="${wy2-10}" width="${w2x-w1x+wr*2}" height="5" rx="2" fill="#555"/>
+  <!-- Wheels -->
+  ${wheel(w1x, wy2, wr)}
+  ${wheel(w2x, wy2, wr)}
+</svg>`;
+}
+
+function buildTrailerSvg(m) {
+  if (m.shape === 'airstream') return svgAirstream(m);
+  if (m.shape === 'round')     return svgRound(m);
+  return svgSquare(m);
+}
+
+function fmt(n) { return n.toLocaleString('de-DE') + ' €'; }
+
+function imgFallback(img, id) {
+  const m = MODELS.find(x => x.id === id);
+  if (!m) return;
+  img.parentNode.style.background = '#111';
+  img.style.display = 'none';
+  img.insertAdjacentHTML('afterend', buildTrailerSvg(m));
+}
+
+function renderCard(m) {
+  const badgeHtml = m.badge ? `<div class="card-badges"><span class="badge badge-${m.badge}">${m.badgeLabel}</span></div>` : '';
+
+  return `<div class="model-card" data-category="${m.category}" data-id="${m.id}">
+    ${badgeHtml}
+    <div class="card-visual">
+      <img src="img/${m.id}.jpg" alt="${m.name}" onerror="imgFallback(this,'${m.id}')">
+    </div>
+    <div class="card-body">
+      <div class="card-series">${m.series}</div>
+      <div class="card-name">${m.name}</div>
+      <div class="card-tagline">${m.tagline}</div>
+      <div class="card-specs">
+        <div class="spec-item">
+          <div class="spec-value">${m.length}</div>
+          <div class="spec-label">Länge</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-value">${m.material}</div>
+          <div class="spec-label">Material</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-value">${m.axle}</div>
+          <div class="spec-label">Achsen</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          <span class="price-from">ab</span>
+          <span class="price-value">${fmt(m.basePrice)}</span>
+          <span class="price-note">exkl. MwSt.</span>
+        </div>
+        <div class="card-actions">
+          <a class="btn-configure" href="index.html?model=${m.id}" onclick="launchConfigurator('${m.id}')">
+            Konfigurieren
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderGrid(filter = 'all') {
+  const grid = document.getElementById('modelsGrid');
+  const filtered = filter === 'all' ? MODELS : MODELS.filter(m => m.category === filter);
+  document.getElementById('modelCount').textContent = filtered.length;
+  grid.innerHTML = filtered.map(renderCard).join('');
+}
+
+function filterModels(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid(cat);
+}
+
+function launchConfigurator(modelId) {
+  sessionStorage.setItem('selectedModel', modelId);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+renderGrid();
+</script>
+</body>
+</html>

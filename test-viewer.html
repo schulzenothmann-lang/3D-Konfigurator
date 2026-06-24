@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anhänger Konfigurator – SMS 5000</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      color: #f0f0f0;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: #111;
+      border-bottom: 1px solid #2a2a2a;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.04em; }
+    header span { font-size: 12px; color: #666; }
+
+    #canvas-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    #canvas-wrap canvas { display: block; width: 100% !important; height: 100% !important; }
+
+    #loading {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: #1a1a1a;
+      gap: 16px;
+      font-size: 14px; color: #888;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #333;
+      border-top-color: #aaa;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Control panel ── */
+    #panel {
+      background: #111;
+      border-top: 1px solid #2a2a2a;
+      padding: 16px 24px;
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .control-group { display: flex; flex-direction: column; gap: 8px; }
+    .control-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #666; }
+
+    /* Window size buttons */
+    .btn-group { display: flex; gap: 6px; }
+    .btn {
+      padding: 7px 18px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #1e1e1e;
+      color: #aaa;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:hover { border-color: #555; color: #eee; }
+    .btn.active {
+      background: #2d2d2d;
+      border-color: #666;
+      color: #fff;
+    }
+
+    /* Color swatches */
+    .color-row { display: flex; gap: 8px; align-items: center; }
+    .swatch {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .swatch:hover { transform: scale(1.15); }
+    .swatch.active { border-color: #fff; }
+
+    .color-custom {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px dashed #444;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #555;
+    }
+    .color-custom input[type=color] {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+
+    .hint {
+      font-size: 11px; color: #444;
+      margin-left: auto;
+      align-self: flex-end;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>SMS 5000 – Anhänger Konfigurator</h1>
+  <span>Drehen: Mausziehen &nbsp;|&nbsp; Zoomen: Scroll</span>
+</header>
+
+<div id="canvas-wrap">
+  <div id="loading">
+    <div class="spinner"></div>
+    Modell wird geladen…
+  </div>
+</div>
+
+<div id="panel">
+  <div class="control-group">
+    <div class="control-label">Ausgabefenster</div>
+    <div class="btn-group">
+      <button class="btn active" data-window="large">Groß</button>
+      <button class="btn"        data-window="medium">Mittel</button>
+      <button class="btn"        data-window="small">Klein</button>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="control-label">Farbe</div>
+    <div class="color-row">
+      <div class="swatch active" data-color="original" style="background: conic-gradient(red,yellow,lime,cyan,blue,magenta,red); border:2px solid #555" title="Original"></div>
+      <div class="swatch" data-color="#1a1a1a" style="background:#1a1a1a" title="Schwarz"></div>
+      <div class="swatch" data-color="#c0392b" style="background:#c0392b" title="Rot"></div>
+      <div class="swatch" data-color="#2980b9" style="background:#2980b9" title="Blau"></div>
+      <div class="swatch" data-color="#27ae60" style="background:#27ae60" title="Grün"></div>
+      <div class="swatch" data-color="#f39c12" style="background:#f39c12" title="Orange"></div>
+      <div class="swatch" data-color="#ecf0f1" style="background:#ecf0f1" title="Weiß"></div>
+      <div class="color-custom" title="Eigene Farbe">
+        +
+        <input type="color" id="custom-color" value="#c0392b" />
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">Modell: SMS 5000</div>
+</div>
+
+<!-- Three.js via CDN -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader }      from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls }   from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment }  from 'three/addons/environments/RoomEnvironment.js';
+
+// ── Scene setup ──────────────────────────────────────────────
+const wrap    = document.getElementById('canvas-wrap');
+const loading = document.getElementById('loading');
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping      = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+wrap.appendChild(renderer.domElement);
+
+// Environment for realistic reflections/ambient
+const pmrem = new THREE.PMREMGenerator(renderer);
+const envTexture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const scene  = new THREE.Scene();
+scene.background = new THREE.Color(0x1e1e1e);
+scene.environment = envTexture;
+scene.fog = new THREE.Fog(0x1e1e1e, 8, 20);
+
+const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 100);
+camera.position.set(1.4, 0.35, 1.1);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance   = 0.5;
+controls.maxDistance   = 5;
+controls.target.set(0, 0.05, 0);
+
+// ── Lighting ─────────────────────────────────────────────────
+const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambient);
+
+const key = new THREE.DirectionalLight(0xffffff, 3.0);
+key.position.set(3, 5, 3);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+scene.add(key);
+
+const fill = new THREE.DirectionalLight(0xc8d8ff, 1.2);
+fill.position.set(-3, 2, -2);
+scene.add(fill);
+
+const rim = new THREE.DirectionalLight(0xffffff, 0.8);
+rim.position.set(0, 3, -4);
+scene.add(rim);
+
+// Ground plane
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 20),
+  new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -0.21;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ── Resize handler ───────────────────────────────────────────
+function resize() {
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(wrap);
+resize();
+
+// ── State ────────────────────────────────────────────────────
+const INFILL_NAMES = {
+  medium: ['Window_Infill_Medium_Left', 'Window_Infill_Medium_Right'],
+  small:  ['Window_Infill_Small_Left',  'Window_Infill_Small_Right'],
+};
+let currentWindow  = 'large';
+let currentColor   = 'original';
+let infillMeshes   = {};
+// { mesh, origColor, origMap } for each body mesh
+let bodyMeshData   = [];
+let infillMat      = null;
+
+// ── Load GLB ─────────────────────────────────────────────────
+const loader = new GLTFLoader();
+loader.load('./public/trailer.glb', (gltf) => {
+  const model = gltf.scene;
+
+  const box = new THREE.Box3().setFromObject(model);
+  const center = box.getCenter(new THREE.Vector3());
+  model.position.sub(center);
+  scene.add(model);
+
+  model.traverse((node) => {
+    if (!node.isMesh) return;
+    const n = node.name;
+
+    if (n.startsWith('Window_Infill_')) {
+      infillMeshes[n] = node;
+      node.visible = false;
+      if (!infillMat && node.material) infillMat = node.material;
+      return;
+    }
+
+    // Store original material color so we can restore "original" look
+    const mats = Array.isArray(node.material) ? node.material : [node.material];
+    mats.forEach(m => {
+      if (!m) return;
+      bodyMeshData.push({
+        mat:      m,
+        origColor: m.color.clone(),
+        origMap:   m.map,
+      });
+    });
+    node.castShadow    = true;
+    node.receiveShadow = true;
+  });
+
+  loading.style.display = 'none';
+
+}, undefined, (err) => {
+  loading.innerHTML = `<div style="color:#e74c3c">Fehler beim Laden: ${err.message}</div>`;
+});
+
+// ── Window variant ───────────────────────────────────────────
+function applyWindow(variant) {
+  currentWindow = variant;
+  Object.values(infillMeshes).forEach(m => m.visible = false);
+  (INFILL_NAMES[variant] ?? []).forEach(n => {
+    if (infillMeshes[n]) infillMeshes[n].visible = true;
+  });
+  // Sync infill panel to current body color
+  if (infillMat) {
+    if (currentColor === 'original') {
+      infillMat.color.set(0x111111);
+    } else {
+      infillMat.color.set(currentColor);
+    }
+  }
+}
+
+// ── Color ────────────────────────────────────────────────────
+function applyColor(hexOrOriginal) {
+  currentColor = hexOrOriginal;
+  const isOriginal = hexOrOriginal === 'original';
+  const col = isOriginal ? null : new THREE.Color(hexOrOriginal);
+
+  bodyMeshData.forEach(({ mat, origColor, origMap }) => {
+    if (isOriginal) {
+      // Restore original texture + color
+      mat.color.copy(origColor);
+      mat.map = origMap;
+      mat.needsUpdate = true;
+    } else {
+      // Replace with flat color, remove texture so color is pure
+      mat.color.copy(col);
+      mat.map = null;
+      mat.needsUpdate = true;
+    }
+  });
+
+  if (infillMat) {
+    infillMat.color.set(isOriginal ? 0x111111 : hexOrOriginal);
+  }
+}
+
+// ── UI events ────────────────────────────────────────────────
+document.querySelectorAll('[data-window]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-window]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyWindow(btn.dataset.window);
+  });
+});
+
+document.querySelectorAll('.swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+    applyColor(sw.dataset.color);
+  });
+});
+
+document.getElementById('custom-color').addEventListener('input', e => {
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  applyColor(e.target.value);
+});
+
+document.querySelector('.color-custom').addEventListener('click', () => {
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+});
+
+// ── Render loop ───────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

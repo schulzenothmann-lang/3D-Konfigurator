@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINO – Food Trailer Konfigurator</title>
+
+<!-- Three.js ES module imports -->
+<script type="importmap">
+{
+  "imports": {
+    "three":           "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "three/addons/":   "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+/* ============================================================
+   TOKENS
+============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --white: #ffffff;
+  --off:   #f5f5f3;
+  --light: #ebebeb;
+  --mid:   #c8c8c8;
+  --dark:  #1c1c1e;
+  --black: #0a0a0a;
+  --accent:#1a4a6b;
+  --accent2:#2563a8;
+  --muted: #6b6b6e;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+html { font-size: 16px; }
+body {
+  font-family: var(--font);
+  background: var(--black);
+  color: var(--white);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   TOP NAV
+============================================================ */
+.topnav {
+  height: 52px;
+  background: rgba(10,10,10,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  flex-shrink: 0;
+  z-index: 200;
+}
+.logo {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: var(--white);
+  text-decoration: none;
+}
+.logo span { color: #5b9bd5; }
+.nav-back-link {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  font-size: .72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.4);
+  text-decoration: none;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  transition: color .2s;
+  white-space: nowrap;
+}
+.nav-back-link:hover { color: rgba(255,255,255,.8); }
+.nav-center {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.step-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+.step-nav-item:not(:last-child)::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: rgba(255,255,255,.2);
+  margin: 0 4px;
+}
+.step-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 100px;
+  transition: background .2s var(--ease);
+}
+.step-pill:hover { background: rgba(255,255,255,.07); }
+.step-pill.active { background: rgba(255,255,255,.12); }
+.step-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  font-size: .65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,.5);
+  transition: all .2s;
+}
+.step-pill.active .step-num,
+.step-pill.done .step-num {
+  background: var(--accent2);
+  color: var(--white);
+}
+.step-pill.done .step-num::after { content: '✓'; font-size: .6rem; }
+.step-label {
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  transition: color .2s;
+}
+.step-pill.active .step-label { color: var(--white); }
+.step-pill.done .step-label { color: rgba(255,255,255,.6); }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.nav-price {
+  font-size: .82rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.55);
+  letter-spacing: -.01em;
+}
+.nav-price strong {
+  color: var(--white);
+  font-size: .95rem;
+}
+
+/* ============================================================
+   MAIN AREA
+============================================================ */
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  overflow: hidden;
+}
+
+/* ============================================================
+   PREVIEW
+============================================================ */
+.preview {
+  position: relative;
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Subtle grid background */
+.preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* Vignette */
+.preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.6) 100%);
+  pointer-events: none;
+}
+
+.preview-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 700px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.trailer-svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 30px 80px rgba(0,0,0,.8));
+  transition: all .5s var(--ease);
+}
+
+/* ── 3D Canvas ───────────────────────────────────────────── */
+#glbCanvas {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 2;
+}
+.glb-active #glbCanvas           { display: block; }
+.glb-active .preview-placeholder { opacity: 0; pointer-events: none; }
+.glb-active .preview-selection-tag { z-index: 3; }
+
+/* Placeholder for models without 3D view */
+.preview-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  z-index: 1;
+  pointer-events: none;
+}
+.preview-placeholder span {
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.15);
+}
+
+/* Loading spinner */
+.glb-loading::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 36px; height: 36px;
+  border: 3px solid rgba(255,255,255,.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  z-index: 10;
+}
+@keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+.preview-meta {
+  margin-top: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+}
+.preview-badge {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  background: rgba(37,99,168,.15);
+  border: 1px solid rgba(37,99,168,.3);
+  padding: .2rem .7rem;
+  border-radius: 100px;
+}
+.preview-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -.03em;
+}
+.preview-dims {
+  font-size: .78rem;
+  color: rgba(255,255,255,.4);
+}
+
+/* View selector */
+.view-selector {
+  display: flex;
+  gap: .4rem;
+  margin-top: 1.5rem;
+}
+.view-btn {
+  padding: .35rem .9rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.45);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.view-btn:hover { background: rgba(255,255,255,.1); color: rgba(255,255,255,.8); }
+.view-btn.active {
+  background: rgba(255,255,255,.14);
+  border-color: rgba(255,255,255,.35);
+  color: var(--white);
+}
+
+/* Selected indicator on preview */
+.preview-selection-tag {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  padding: .6rem 1.2rem;
+  z-index: 2;
+  white-space: nowrap;
+}
+.sel-item {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .75rem;
+  color: rgba(255,255,255,.7);
+}
+.sel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.sel-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255,255,255,.15);
+}
+
+/* ============================================================
+   PANEL
+============================================================ */
+.panel {
+  background: var(--white);
+  color: var(--dark);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-left: none;
+}
+
+/* Step header */
+.panel-header {
+  padding: 1.75rem 2rem 0;
+  flex-shrink: 0;
+}
+.panel-step-label {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: .4rem;
+}
+.panel-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  color: var(--dark);
+  line-height: 1.2;
+}
+.panel-desc {
+  font-size: .8rem;
+  color: var(--muted);
+  margin-top: .3rem;
+  line-height: 1.5;
+}
+.panel-divider {
+  height: 1px;
+  background: var(--light);
+  margin: 1.25rem 0 0;
+}
+
+/* Panel body */
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 2rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mid) transparent;
+}
+.panel-body::-webkit-scrollbar { width: 4px; }
+.panel-body::-webkit-scrollbar-thumb { background: var(--mid); border-radius: 2px; }
+
+/* ============================================================
+   OPTION CARDS — MODEL/SIZE
+============================================================ */
+.model-cards {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+.model-card {
+  position: relative;
+  border: 1.5px solid var(--light);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  overflow: hidden;
+}
+.model-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent2);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.model-card:hover { border-color: #b0c8e8; background: #f7fafd; }
+.model-card.selected {
+  border-color: var(--accent2);
+  background: #f0f6fd;
+}
+.model-card.selected::before { opacity: 1; }
+.model-card-thumb {
+  width: 72px;
+  height: 48px;
+  border-radius: 6px;
+  background: var(--off);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.model-card-thumb svg { width: 100%; height: 100%; }
+.model-card-body { flex: 1; min-width: 0; }
+.model-card-name {
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--dark);
+  letter-spacing: -.01em;
+}
+.model-card-spec {
+  font-size: .73rem;
+  color: var(--muted);
+  margin-top: .15rem;
+}
+.model-card-price {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.model-card-radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--mid);
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color .2s;
+}
+.model-card.selected .model-card-radio {
+  border-color: var(--accent2);
+  background: var(--accent2);
+}
+.model-card.selected .model-card-radio::after {
+  content: '';
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--white);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ============================================================
+   OPTION CARDS — COLOR
+============================================================ */
+.color-section-label {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .75rem;
+}
+.color-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .5rem;
+  margin-bottom: 1.5rem;
+}
+.color-card {
+  border-radius: 10px;
+  border: 1.5px solid var(--light);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all .2s var(--ease);
+  position: relative;
+}
+.color-card:hover { border-color: #aaa; transform: translateY(-1px); }
+.color-card.selected { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,168,.2); }
+.color-card-swatch {
+  height: 56px;
+  transition: filter .2s;
+}
+.color-card:hover .color-card-swatch { filter: brightness(1.05); }
+.color-card-info {
+  padding: .5rem .65rem;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.color-card-name {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+.color-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+.color-card.selected .color-check {
+  background: var(--accent2);
+  border-color: var(--accent2);
+  color: white;
+  font-size: .6rem;
+}
+.color-card.selected .color-check::after { content: '✓'; }
+
+/* ============================================================
+   OPTION CARDS — WINDOW LAYOUT
+============================================================ */
+.layout-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+}
+.layout-card {
+  border: 1.5px solid var(--light);
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all .2s var(--ease);
+  background: var(--white);
+}
+.layout-card:hover { border-color: #aaa; }
+.layout-card.selected { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,168,.2); }
+.layout-card-preview {
+  background: var(--off);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: .5rem;
+}
+.layout-card-preview svg { width: 100%; height: 100%; }
+.layout-card-label {
+  padding: .45rem .6rem;
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--dark);
+  border-top: 1px solid var(--light);
+}
+
+/* Window size segment */
+.seg-label {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 1.25rem 0 .5rem;
+}
+.segment {
+  display: flex;
+  background: var(--off);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.seg-btn {
+  flex: 1;
+  padding: .45rem .4rem;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.seg-btn.active {
+  background: var(--white);
+  color: var(--dark);
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+}
+
+/* ============================================================
+   OPTION CARDS — EXTRAS
+============================================================ */
+.extra-cards {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.extra-card {
+  border: 1.5px solid var(--light);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  background: var(--white);
+}
+.extra-card:hover { border-color: #aaa; }
+.extra-card.selected { border-color: var(--accent2); background: #f0f6fd; }
+.extra-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .9rem 1.1rem;
+}
+.extra-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--off);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  transition: background .2s;
+}
+.extra-card.selected .extra-card-icon { background: rgba(37,99,168,.12); }
+.extra-card-body { flex: 1; min-width: 0; }
+.extra-card-name {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+.extra-card-desc {
+  font-size: .72rem;
+  color: var(--muted);
+  margin-top: .1rem;
+}
+.extra-card-price {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+  margin-right: .5rem;
+}
+.extra-toggle {
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--mid);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.extra-toggle::after {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  background: var(--white);
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: transform .2s var(--ease);
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.extra-card.selected .extra-toggle { background: var(--accent2); }
+.extra-card.selected .extra-toggle::after { transform: translateX(18px); }
+
+/* ============================================================
+   BOTTOM BAR
+============================================================ */
+.bottom-bar {
+  height: 72px;
+  background: var(--white);
+  border-top: 1px solid var(--light);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+.bottom-summary {
+  flex: 1;
+}
+.bottom-step-info {
+  font-size: .7rem;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: .15rem;
+}
+.bottom-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark);
+  letter-spacing: -.02em;
+}
+.bottom-price span { color: var(--accent2); }
+
+.btn-ghost-dark {
+  padding: .65rem 1.4rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--light);
+  background: var(--white);
+  color: var(--dark);
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  white-space: nowrap;
+}
+.btn-ghost-dark:hover { border-color: var(--mid); background: var(--off); }
+.btn-ghost-dark:disabled { opacity: .35; cursor: default; }
+
+.btn-primary {
+  padding: .7rem 1.8rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: var(--white);
+  font-size: .88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,74,107,.3); }
+
+/* ============================================================
+   SUMMARY STEP
+============================================================ */
+.summary-grid {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: .55rem 0;
+  border-bottom: 1px solid var(--light);
+  font-size: .85rem;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-row-label { color: var(--muted); }
+.summary-row-value { font-weight: 600; color: var(--dark); }
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: .9rem 0 0;
+  margin-top: .4rem;
+  border-top: 2px solid var(--dark);
+}
+.summary-total-label { font-size: 1rem; font-weight: 700; }
+.summary-total-value { font-size: 1.25rem; font-weight: 800; color: var(--accent2); letter-spacing: -.02em; }
+.summary-note { font-size: .7rem; color: var(--muted); margin-top: .5rem; }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 860px) {
+  body { overflow: auto; }
+  .main { grid-template-columns: 1fr; overflow: visible; }
+  .preview { min-height: 320px; }
+  .panel { min-height: auto; }
+  .bottom-bar { position: sticky; bottom: 0; }
+  .nav-center { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<header class="topnav">
+  <a class="logo" href="models.html" title="Zurück zur Modellauswahl">MI<span>NO</span></a>
+
+  <a href="models.html" class="nav-back-link" id="navBackLink">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    Alle Modelle
+  </a>
+  <nav class="nav-center" id="topSteps">
+    <!-- filled by JS -->
+  </nav>
+
+  <div class="nav-right">
+    <div class="nav-price">
+      Konfiguriert ab <strong id="navPrice">18.900 €</strong>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- PREVIEW -->
+  <div class="preview">
+    <canvas id="glbCanvas"></canvas>
+    <!-- Placeholder für Modelle ohne 3D-Ansicht -->
+    <div class="preview-placeholder" id="previewPlaceholder">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      <span>3D-Modell folgt</span>
+    </div>
+
+  </div>
+
+  <!-- OPTIONS PANEL -->
+  <div class="panel">
+    <div class="panel-header" id="panelHeader">
+      <!-- filled by JS -->
+    </div>
+    <div class="panel-divider"></div>
+    <div class="panel-body" id="panelBody">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="bottom-summary">
+    <div class="bottom-step-info" id="bottomStepInfo">Schritt 1 von 4</div>
+    <div class="bottom-price">Gesamtpreis <span id="bottomPrice">18.900 €</span></div>
+  </div>
+  <button class="btn-ghost-dark" id="btnBack" onclick="goStep(-1)" disabled>← Zurück</button>
+  <button class="btn-primary" id="btnNext" onclick="btnNextAction()">
+    Weiter
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+============================================================ */
+const STEPS = [
+  { id:'model',   label:'Modell',   icon:'📐' },
+  { id:'color',   label:'Farbe',    icon:'🎨' },
+  { id:'windows', label:'Fenster',  icon:'🪟' },
+  { id:'extras',  label:'Extras',   icon:'✨' },
+  { id:'summary', label:'Übersicht',icon:'📋' }
+];
+
+const MODELS = [
+  { id:'s',  name:'S – Compact', dims:'3,5 m × 2,1 m × 2,5 m', spec:'Einzelachse · bis 2.500 kg', base:18900, svgW:400 },
+  { id:'m',  name:'M – Standard',dims:'5,0 m × 2,1 m × 2,7 m', spec:'Tandem-Achse · bis 3.500 kg',base:24900, svgW:552 },
+  { id:'l',  name:'L – Pro',     dims:'6,5 m × 2,4 m × 2,9 m', spec:'Tandem-Achse · bis 3.500 kg',base:32900, svgW:650 },
+  { id:'xl', name:'XL – Event',  dims:'8,0 m × 2,4 m × 2,9 m', spec:'Tri-Achse · bis 5.000 kg',   base:42900, svgW:700 }
+];
+
+const COLORS = [
+  { id:'black',     name:'Schwarz Matt',  hex:'#111111',  group:'Dunkel' },
+  { id:'nightblue', name:'Nachtblau',     hex:'#1a1a2e',  group:'Dunkel' },
+  { id:'darkgreen', name:'Dunkelgrün',    hex:'#2d4a22',  group:'Dunkel' },
+  { id:'bordeaux',  name:'Bordeaux',      hex:'#3d1a0a',  group:'Dunkel' },
+  { id:'steelblue', name:'Stahlblau',     hex:'#1a3a5c',  group:'Dunkel' },
+  { id:'silver',    name:'Silber Metallic',hex:'#c0c0be', group:'Hell' },
+  { id:'white',     name:'Weiß Glanz',   hex:'#f3f3f1',  group:'Hell' },
+  { id:'champagne', name:'Champagner',    hex:'#e8d5b0',  group:'Hell' },
+  { id:'red',       name:'Signalrot',     hex:'#cc3300',  group:'Bunt' },
+  { id:'yellow',    name:'Sonnengelb',    hex:'#f0a500',  group:'Bunt' }
+];
+
+const LAYOUTS = [
+  { id:'single-l', name:'1 × Groß Links',  svgFn: () => layoutSvg('single-l') },
+  { id:'single-r', name:'1 × Groß Rechts', svgFn: () => layoutSvg('single-r') },
+  { id:'double',   name:'2 × Mittel',      svgFn: () => layoutSvg('double')   },
+  { id:'full',     name:'Vollöffnung',      svgFn: () => layoutSvg('full')     },
+  { id:'triple',   name:'3 × Klein',        svgFn: () => layoutSvg('triple')   },
+  { id:'lshape',   name:'L-Form',           svgFn: () => layoutSvg('lshape')   }
+];
+
+const WIN_SIZES = [
+  { id:'s', label:'Klein' },
+  { id:'m', label:'Mittel' },
+  { id:'l', label:'Groß' },
+  { id:'xl',label:'XL' }
+];
+
+const EXTRAS = [
+  { id:'led',      name:'LED-Leuchtschild',    desc:'Programmierbare RGB-Laufschrift',          icon:'💡', price:890  },
+  { id:'awning',   name:'Markise elektrisch',   desc:'Ausfahrbare Markise, 2,0 m Ausladung',     icon:'⛱️', price:1290 },
+  { id:'intled',   name:'LED-Innenbeleuchtung', desc:'Dimmbare Strips, warm- & kaltweiß',        icon:'🔆', price:390  },
+  { id:'counter',  name:'Edelstahl-Theke',      desc:'Ausgabetresen klappbar, 304-Edelstahl',    icon:'🍽️', price:680  },
+  { id:'solar',    name:'Solaranlage 200 W',    desc:'Monokristallin, MPPT-Regler + 100 Ah',     icon:'☀️', price:1890 },
+  { id:'sink',     name:'Spülbecken-Set',        desc:'Doppelspüle, 20 L Frischwassertank',       icon:'🚿', price:540  },
+  { id:'ac',       name:'Klimaanlage Split',     desc:'9.000 BTU, Kühl- & Heizbetrieb',          icon:'❄️', price:1490 },
+  { id:'fire',     name:'Brandschutzanlage',     desc:'Automatische Küchenlöschanlage',           icon:'🧯', price:1100 }
+];
+
+/* ============================================================
+   STATE
+============================================================ */
+const S = {
+  step: 0,
+  model: 'm',
+  color: 'black',
+  layout: 'single-l',
+  winSize: 'm',
+  winVariant: 'large',  // for SMS-5000 3D model: 'large' | 'medium' | 'small'
+  extras: new Set(),
+  view: 'side'
+};
+
+const WIN_VARIANTS_3D = [
+  { id: 'large',  label: 'Groß',   desc: 'Volle Ausgabehöhe' },
+  { id: 'medium', label: 'Mittel', desc: 'Mittlere Öffnung'  },
+  { id: 'small',  label: 'Klein',  desc: 'Kompakte Öffnung'  },
+];
+
+/* ============================================================
+   UTILS
+============================================================ */
+function getModel()  { return MODELS.find(m => m.id === S.model); }
+function getColor()  { return COLORS.find(c => c.id === S.color); }
+function getLayout() { return LAYOUTS.find(l => l.id === S.layout); }
+
+function totalPrice() {
+  let t = getModel().base;
+  for (const id of S.extras) t += EXTRAS.find(e => e.id === id).price;
+  return t;
+}
+
+function fmt(n) { return n.toLocaleString('de-DE') + ' €'; }
+
+/* ============================================================
+   STEP NAVIGATION
+============================================================ */
+function buildTopNav() {
+  const nav = document.getElementById('topSteps');
+  nav.innerHTML = STEPS.map((s, i) => `
+    <button class="step-nav-item" onclick="jumpStep(${i})">
+      <div class="step-pill ${i === S.step ? 'active' : i < S.step ? 'done' : ''}" id="stepPill${i}">
+        <div class="step-num">${i < S.step ? '' : i + 1}</div>
+        <span class="step-label">${s.label}</span>
+      </div>
+      ${i < STEPS.length - 1 ? '' : ''}
+    </button>
+  `).join('');
+}
+
+function jumpStep(i) {
+  if (i > S.step) return; // can only go back
+  S.step = i;
+  render();
+}
+
+function btnNextAction() {
+  const btn = document.getElementById('btnNext');
+  if (btn.dataset.action === 'quote') requestQuote();
+  else goStep(1);
+}
+
+function goStep(dir) {
+  S.step = Math.max(0, Math.min(STEPS.length - 1, S.step + dir));
+  render();
+}
+
+/* ============================================================
+   RENDER
+============================================================ */
+function render() {
+  buildTopNav();
+  renderPanel();
+  renderSvg();
+  updateBottomBar();
+}
+
+function updateBottomBar() {
+  document.getElementById('bottomStepInfo').textContent =
+    `Schritt ${S.step + 1} von ${STEPS.length}`;
+  document.getElementById('bottomPrice').textContent = fmt(totalPrice());
+  document.getElementById('navPrice').textContent = fmt(totalPrice());
+  document.getElementById('btnBack').disabled = S.step === 0;
+  const btnNext = document.getElementById('btnNext');
+  if (S.step === STEPS.length - 1) {
+    btnNext.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.45 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.08-1.08a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Angebot anfragen`;
+    btnNext.dataset.action = 'quote';
+  } else {
+    btnNext.innerHTML = `Weiter <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
+    btnNext.dataset.action = 'next';
+  }
+}
+
+/* ============================================================
+   PANEL STEPS
+============================================================ */
+function renderPanel() {
+  const step = STEPS[S.step];
+  const header = document.getElementById('panelHeader');
+  const body   = document.getElementById('panelBody');
+
+  const titles = {
+    model:   ['Modell & Größe', 'Wählen Sie das Basismodell Ihres Food Trailers.'],
+    color:   ['Außenfarbe', 'Personalisieren Sie Ihren Trailer mit einer hochwertigen Pulverbeschichtung.'],
+    windows: ['Fenster & Serviceklappe', 'Konfigurieren Sie Öffnung und Größe der Ausgabefenster.'],
+    extras:  ['Ausstattung & Extras', 'Erweitern Sie Ihren Trailer mit optionalen Modulen.'],
+    summary: ['Ihre Konfiguration', 'Prüfen Sie Ihre Auswahl und senden Sie uns eine Anfrage.']
+  };
+
+  const [title, desc] = titles[step.id];
+  header.innerHTML = `
+    <div class="panel-step-label">Schritt ${S.step + 1} – ${step.label}</div>
+    <div class="panel-title">${title}</div>
+    <div class="panel-desc">${desc}</div>
+  `;
+
+  if (step.id === 'model')   body.innerHTML = renderModelStep();
+  if (step.id === 'color')   body.innerHTML = renderColorStep();
+  if (step.id === 'windows') body.innerHTML = renderWindowStep();
+  if (step.id === 'extras')  body.innerHTML = renderExtrasStep();
+  if (step.id === 'summary') body.innerHTML = renderSummaryStep();
+}
+
+/* --- MODEL --- */
+function renderModelStep() {
+  return `<div class="model-cards">${MODELS.map(m => `
+    <div class="model-card ${S.model===m.id?'selected':''}" onclick="selectModel('${m.id}')">
+      <div class="model-card-thumb">${miniTrailerSvg(m.id)}</div>
+      <div class="model-card-body">
+        <div class="model-card-name">${m.name}</div>
+        <div class="model-card-spec">${m.dims}</div>
+        <div class="model-card-spec">${m.spec}</div>
+      </div>
+      <div class="model-card-price">ab ${fmt(m.base)}</div>
+      <div class="model-card-radio"></div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function miniTrailerSvg(id) {
+  const w = {s:.72, m:.88, l:1, xl:1}[id];
+  const bw = Math.round(64 * w); const bx = Math.round((72 - bw)/2);
+  return `<svg viewBox="0 0 72 48" xmlns="http://www.w3.org/2000/svg">
+    <rect x="${bx}" y="6" width="${bw}" height="26" rx="2" fill="${getColor().hex}"/>
+    <rect x="${bx-2}" y="4" width="${bw+4}" height="5" rx="1" fill="#bbb"/>
+    <rect x="${bx}" y="30" width="${bw}" height="4" rx="1" fill="#aaa"/>
+    <circle cx="${bx+10}" cy="38" r="6" fill="#333"/>
+    <circle cx="${bx+bw-10}" cy="38" r="6" fill="#333"/>
+    <rect x="${bx+3}" y="11" width="${Math.round(bw*.6)}" height="12" rx="1" fill="rgba(160,210,230,.5)" stroke="rgba(255,255,255,.2)" stroke-width="1"/>
+  </svg>`;
+}
+
+/* --- COLOR --- */
+function renderColorStep() {
+  const groups = {};
+  COLORS.forEach(c => { (groups[c.group] = groups[c.group]||[]).push(c); });
+  return Object.entries(groups).map(([grp, cols]) => `
+    <div class="color-section-label">${grp}</div>
+    <div class="color-cards">${cols.map(c => `
+      <div class="color-card ${S.color===c.id?'selected':''}" onclick="selectColor('${c.id}')">
+        <div class="color-card-swatch" style="background:${c.hex}"></div>
+        <div class="color-card-info">
+          <span class="color-card-name">${c.name}</span>
+          <span class="color-check"></span>
+        </div>
+      </div>`).join('')}
+    </div>`).join('');
+}
+
+/* --- WINDOWS --- */
+function renderWindowStep() {
+  return renderWindowStep3D();
+}
+
+function renderWindowStep3D() {
+  return `
+    <div class="color-section-label">Ausgabefenstergröße</div>
+    <div class="layout-cards" style="grid-template-columns:1fr 1fr 1fr">
+      ${WIN_VARIANTS_3D.map(v => `
+        <div class="layout-card ${S.winVariant===v.id?'selected':''}" onclick="selectWindowVariant('${v.id}')">
+          <div class="layout-card-preview">${windowVariantSvg(v.id)}</div>
+          <div class="layout-card-label" style="display:flex;flex-direction:column;gap:.15rem">
+            <strong>${v.label}</strong>
+            <span style="font-size:.63rem;color:var(--muted);font-weight:400">${v.desc}</span>
+          </div>
+        </div>`).join('')}
+    </div>
+    <p style="margin-top:1rem;font-size:.75rem;color:var(--muted);line-height:1.5">
+      Das 3D-Modell zeigt die Fensteränderung in Echtzeit.
+    </p>`;
+}
+
+function windowVariantSvg(variant) {
+  const bw = 78, bh = 38, bx = 11, by = 3;
+  const ww = Math.round(bw * 0.65), wx = bx + Math.round((bw - ww) / 2);
+  const wTop = by + 8, wBottom = by + bh - 4;
+  const totalH = wBottom - wTop;
+  const openH  = { large: totalH, medium: Math.round(totalH * 0.6), small: Math.round(totalH * 0.3) }[variant];
+  const infH   = totalH - openH;
+  return `<svg viewBox="0 0 100 48" xmlns="http://www.w3.org/2000/svg">
+    <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="#888"/>
+    <rect x="${bx-2}" y="${by-2}" width="${bw+4}" height="6" rx="2" fill="#b0b0b0"/>
+    ${infH > 0 ? `<rect x="${wx}" y="${wTop}" width="${ww}" height="${infH}" rx="1" fill="#c0c0c0"/>` : ''}
+    <rect x="${wx}" y="${wTop+infH}" width="${ww}" height="${openH}" rx="1" fill="rgba(37,99,168,.6)"/>
+    <circle cx="${bx+14}" cy="${by+bh+8}" r="5" fill="#555"/>
+    <circle cx="${bx+bw-14}" cy="${by+bh+8}" r="5" fill="#555"/>
+  </svg>`;
+}
+
+/* --- EXTRAS --- */
+function renderExtrasStep() {
+  return `<div class="extra-cards">${EXTRAS.map(e => `
+    <div class="extra-card ${S.extras.has(e.id)?'selected':''}" onclick="toggleExtra('${e.id}')">
+      <div class="extra-card-inner">
+        <div class="extra-card-icon">${e.icon}</div>
+        <div class="extra-card-body">
+          <div class="extra-card-name">${e.name}</div>
+          <div class="extra-card-desc">${e.desc}</div>
+        </div>
+        <div class="extra-card-price">+${fmt(e.price)}</div>
+        <button class="extra-toggle" tabindex="-1"></button>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+/* --- SUMMARY --- */
+function renderSummaryStep() {
+  const m = getModel();
+  const c = getColor();
+  const extraRows = [...S.extras].map(id => {
+    const e = EXTRAS.find(ex => ex.id === id);
+    return `<div class="summary-row"><span class="summary-row-label">${e.icon} ${e.name}</span><span class="summary-row-value">+${fmt(e.price)}</span></div>`;
+  }).join('');
+  const vLabel = WIN_VARIANTS_3D.find(v => v.id === S.winVariant)?.label ?? 'Groß';
+  const winStr = `Ausgabefenster ${vLabel}`;
+  return `
+    <div class="summary-grid">
+      <div class="summary-row"><span class="summary-row-label">Modell</span><span class="summary-row-value">${m.name}</span></div>
+      <div class="summary-row"><span class="summary-row-label">Abmessung</span><span class="summary-row-value">${m.dims}</span></div>
+      <div class="summary-row"><span class="summary-row-label">Außenfarbe</span><span class="summary-row-value" style="display:flex;align-items:center;gap:.4rem"><span style="width:12px;height:12px;border-radius:50%;background:${c.hex};border:1px solid rgba(0,0,0,.15);display:inline-block"></span>${c.name}</span></div>
+      <div class="summary-row"><span class="summary-row-label">Fenster</span><span class="summary-row-value">${winStr}</span></div>
+      <div class="summary-row"><span class="summary-row-label">Basispreis</span><span class="summary-row-value">${fmt(m.base)}</span></div>
+      ${extraRows}
+    </div>
+    <div class="summary-total">
+      <span class="summary-total-label">Gesamt (exkl. MwSt.)</span>
+      <span class="summary-total-value">${fmt(totalPrice())}</span>
+    </div>
+    <div class="summary-note">Unverbindliche Kalkulation. Endpreis nach individueller Beratung.</div>
+    <div style="margin-top:1.25rem">
+      <button onclick="saveConfig()" style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);background:none;border:none;cursor:pointer;padding:.3rem 0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Konfiguration als PDF speichern
+      </button>
+    </div>`;
+}
+
+/* ============================================================
+   LAYOUT SVG HELPERS
+============================================================ */
+function layoutSvg(id) {
+  const bg = '#e8e8e8', win = 'rgba(37,99,168,.55)', frame = 'rgba(37,99,168,.2)';
+  const base = `<rect width="100" height="50" rx="3" fill="${bg}"/>`;
+  const m = 6;
+  const h = 26, y = 12;
+  const W = 100 - m*2;
+  if (id==='single-l') return base + rect(m, y, W*.7, h, win) + rect(m+W*.7+3, y, W*.3-3, h, frame);
+  if (id==='single-r') return base + rect(m, y, W*.3-3, h, frame) + rect(m+W*.3, y, W*.7, h, win);
+  if (id==='double')   return base + rect(m, y, W/2-3, h, win) + rect(m+W/2+3, y, W/2-3, h, win);
+  if (id==='full')     return base + rect(m, y, W, h, win);
+  if (id==='triple') { const tw=(W-8)/3; return base + rect(m,y,tw,h,win)+rect(m+tw+4,y,tw,h,win)+rect(m+tw*2+8,y,tw,h,win); }
+  if (id==='lshape')   return base + rect(m, 6, W, 10, 'rgba(37,99,168,.35)') + rect(m, 20, W*.55, h-8, win);
+  return base;
+}
+function rect(x,y,w,h,fill) {
+  return `<rect x="${x}" y="${y}" width="${Math.round(w)}" height="${h}" rx="2" fill="${fill}"/>`;
+}
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+function selectModel(id) {
+  S.model = id;
+  renderPanel();
+  updateBottomBar();
+}
+
+function colorHexFor3d(colorId) {
+  return COLORS.find(c => c.id === colorId).hex;
+}
+
+function selectColor(id) {
+  S.color = id;
+  if (window.preview3d) window.preview3d.setColor(colorHexFor3d(id));
+  renderPanel();
+}
+
+function selectLayout(id) {
+  S.layout = id;
+  document.getElementById('layoutTagName').textContent = getLayout().name;
+  renderPanel();
+  renderSvg();
+}
+
+function selectWinSize(id) {
+  S.winSize = id;
+  renderPanel();
+  renderSvg();
+}
+
+function selectWindowVariant(variant) {
+  S.winVariant = variant;
+  if (window.preview3d) window.preview3d.setWindowVariant(variant);
+  renderPanel();
+}
+
+function toggleExtra(id) {
+  if (S.extras.has(id)) S.extras.delete(id); else S.extras.add(id);
+  renderPanel();
+  updateBottomBar();
+}
+
+/* ============================================================
+   SVG RENDERING — nicht mehr verwendet, no-op für Kompatibilität
+============================================================ */
+function renderSvg() {}
+function drawWindows() {}
+function el() {}
+
+/* ============================================================
+   CTA
+============================================================ */
+function requestQuote() {
+  const lines = buildSummaryText();
+  alert('Anfragezusammenfassung:\n\n' + lines + '\n\nIn der Website öffnet sich hier ein Kontaktformular mit vorausgefüllten Konfigurationsdaten.');
+}
+function saveConfig() {
+  const blob = new Blob([buildSummaryText()], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'MINO-Konfiguration.txt';
+  a.click();
+}
+function buildSummaryText() {
+  const m = getModel(), c = getColor(), l = getLayout();
+  const extraLines = [...S.extras].map(id => {
+    const e = EXTRAS.find(ex=>ex.id===id);
+    return `  + ${e.name}: ${fmt(e.price)}`;
+  }).join('\n');
+  return `MINO Food Trailer – Konfiguration
+===================================
+Modell:     ${m.name}
+Abmessung:  ${m.dims}
+Außenfarbe: ${c.name}
+Fenster:    ${l.name}, ${WIN_SIZES.find(w=>w.id===S.winSize).label}
+${extraLines ? '\nExtras:\n' + extraLines : ''}
+
+Gesamtpreis: ${fmt(totalPrice())} (exkl. MwSt.)
+Konfiguriert am: ${new Date().toLocaleDateString('de-DE')}`;
+}
+
+/* ============================================================
+   MODEL MAPPING — from models.html IDs to configurator sizes
+============================================================ */
+const MODEL_MAP = {
+  'smr-2800': { size: 's',  label: 'SMR-2800 Round' },
+  'sma-4000': { size: 'm',  label: 'SMA-4000 Airstream' },
+  'sma-4500': { size: 'm',  label: 'SMA-4500 Airstream' },
+  'sms-5000': { size: 'l',  label: 'SMS-5000 Square',     glb: 'models/sms-5000.glb' },
+  'sma-5500': { size: 'xl', label: 'SMA-5500 Airstream XL' }
+};
+
+/* currently active model ID (from URL param) */
+let activeModelId = null;
+
+function applyUrlModel() {
+  const params  = new URLSearchParams(window.location.search);
+  const modelId = params.get('model') || sessionStorage.getItem('selectedModel');
+  if (!modelId || !MODEL_MAP[modelId]) return;
+  const m = MODEL_MAP[modelId];
+  S.model       = m.size;
+  activeModelId = modelId;
+  S.winVariant  = 'large';
+  if (m.layout) S.layout = m.layout;
+  sessionStorage.removeItem('selectedModel');
+}
+
+/* load GLB if this model has one, otherwise revert to SVG */
+function syncPreview3d() {
+  const map = activeModelId && MODEL_MAP[activeModelId];
+  if (map && map.glb && window.preview3d) {
+    document.querySelector('.preview').classList.add('glb-loading');
+    // Set color before load so it's applied automatically when GLB finishes
+    window.preview3d.setColor(colorHexFor3d(S.color));
+    window.preview3d.load(map.glb);
+    setTimeout(() => document.querySelector('.preview').classList.remove('glb-loading'), 1200);
+  } else if (window.preview3d) {
+    window.preview3d.dispose();
+  }
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+// Apply model from URL/sessionStorage before rendering
+applyUrlModel();
+
+
+render();
+renderSvg();
+</script>
+
+<!-- 3D Preview module — loads after main script -->
+<script type="module" src="js/preview3d.js"></script>
+<script>
+// Trigger GLB load exactly once: whichever fires first wins
+let _preview3dSynced = false;
+function _onceSyncPreview3d() {
+  if (_preview3dSynced) return;
+  _preview3dSynced = true;
+  syncPreview3d();
+}
+window.addEventListener('preview3d-ready', _onceSyncPreview3d, { once: true });
+window.addEventListener('load', () => {
+  if (window.preview3d) _onceSyncPreview3d();
+});
+</script>
+</body>
+</html>
